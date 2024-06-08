@@ -1,1 +1,1 @@
-Please follow the rules when uploading the codes, keep updating frequently
+Please follow the rules when uploading the codes, and keep updating frequently
