@@ -1,0 +1,46 @@
+name: Check Commit Messages
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  commit_message_check:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Check commit messages
+        run: |
+          # Get the commit message of the latest commit
+          commit_message=$(git log --pretty=format:%B -n 1)
+
+          # Extract title and content lines
+          title=$(echo "$commit_message" | sed -n '1p')
+          content=$(echo "$commit_message" | sed '1d')
+
+          # Check if title is longer than 80 characters
+          if [ ${#title} -gt 80 ]; then
+            echo "Error: Commit title should not exceed 80 characters."
+            exit 1
+          fi
+
+          # Check if there is an empty line after the title
+          if ! echo "$content" | grep -q '^$'; then
+            echo "Error: Commit message should contain an empty line after the title."
+            exit 1
+          fi
+
+          # Check if content lines are longer than 100 characters
+          while IFS= read -r line; do
+            if [ ${#line} -gt 100 ]; then
+              echo "Error: Commit content should not exceed 100 characters per line."
+              exit 1
+            fi
+          done <<< "$content"
